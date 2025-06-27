@@ -1,0 +1,189 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #8eafe0;
+  background-image: url('ushasree.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  position: relative;
+}
+
+
+/* OPTIONAL: Overlay for better readability */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(241, 243, 246, 0.85); /* Light overlay for readability; adjust opacity as needed */
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Ensure all app content is above overlay */
+#root, .main-content, .header, .product-list, .form-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Main content layout */
+.main-content {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 16px;
+}
+
+/* Header styles */
+.header {
+  background: #282d36;
+  color: white;
+  padding: 18px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header .logo {
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+.header nav a {
+  color: white;
+  margin-left: 24px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.header nav a:hover {
+  color: #ffe500;
+}
+
+/* Product list and cards */
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+.product-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(40, 116, 240, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+}
+.product-card:hover {
+  box-shadow: 0 4px 16px rgba(40, 116, 240, 0.18);
+}
+.product-image {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  margin-bottom: 16px;
+}
+.product-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.product-price {
+  font-size: 1.1rem;
+  color: #2874f0;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+.add-to-cart-btn {
+  background: #2874f0;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.add-to-cart-btn:hover {
+  background: #1956a5;
+}
+
+/* Cart, Profile, Login, etc. - minimal clean styling */
+.cart-list,
+.orders-list {
+  background: white;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 1px 6px rgba(40,116,240,0.10);
+  margin-bottom: 24px;
+}
+.cart-item,
+.order-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+.cart-item:last-child,
+.order-item:last-child {
+  border-bottom: none;
+}
+.cart-item-image,
+.order-item-image {
+  width: 80px;
+  height: 80px;
+  margin-right: 18px;
+}
+.cart-item-info {
+  flex: 1;
+}
+.cart-item-title {
+  font-weight: 500;
+  font-size: 1rem;
+}
+.cart-item-price {
+  font-weight: 500;
+  color: #2874f0;
+}
+.cart-item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Forms */
+.form-container {
+  background: white;
+  border-radius: 10px;
+  padding: 32px 24px;
+  box-shadow: 0 1px 6px rgba(40,116,240,0.10);
+  max-width: 380px;
+  margin: 40px auto;
+}
+.form-container input,
+.form-container textarea {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+}
+.form-container button {
+  background: #2874f0;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.form-container button:hover {
+  background: #1956a5;
+}
