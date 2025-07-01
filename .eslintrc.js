@@ -27,5 +27,20 @@ module.exports = {
     react: {
       version: 'detect'
     }
-  }
+  },
+
+  // ✅ Add this overrides block for test files:
+  overrides: [
+    {
+      files: [
+        "*.test.js", "*.spec.js",
+        "*.test.jsx", "*.spec.jsx",
+        "*.test.ts", "*.spec.ts",
+        "*.test.tsx", "*.spec.tsx"
+      ],
+      env: {
+        jest: true
+      }
+    }
+  ]
 };
