@@ -13,14 +13,14 @@ spec:
         app: frontend
     spec:
       containers:
-      - name: frontend
-        image: nvvrsre/usindus-frontend
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
+        - name: frontend
+          image: nvvrsre/usindus-frontend
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
