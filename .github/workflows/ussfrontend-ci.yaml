@@ -56,19 +56,19 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/uss-frontend:v${{ steps.version.outputs.VERSION }} .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:v${{ steps.version.outputs.VERSION }} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/uss-frontend:v${{ steps.version.outputs.VERSION }}
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/frontend:v${{ steps.version.outputs.VERSION }}
           format: 'table'
           exit-code: '0'
           ignore-unfixed: true
 
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/uss-frontend:v${{ steps.version.outputs.VERSION }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:v${{ steps.version.outputs.VERSION }}
 
       # --- Install yq for YAML editing ---
       - name: Install yq
@@ -76,13 +76,25 @@ jobs:
           sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64 -O /usr/local/bin/yq
           sudo chmod +x /usr/local/bin/yq
 
+      # --- Show image before update (debug) ---
+      - name: Show image before update
+        run: grep image k8s/deployment.yaml
+
+      # --- Print all container names (debug) ---
+      - name: Print all container names
+        run: yq '.spec.template.spec.containers[].name' k8s/deployment.yaml
+
       # --- Update deployment.yaml image tag ---
       - name: Update deployment.yaml with new image tag
         run: |
           yq -i '
             .spec.template.spec.containers[] |=
-              select(.name == "uss-frontend") .image = "${{ secrets.DOCKERHUB_USERNAME }}/uss-frontend:v${{ steps.version.outputs.VERSION }}"
+              select(.name == "frontend") .image = "${{ secrets.DOCKERHUB_USERNAME }}/frontend:v${{ steps.version.outputs.VERSION }}"
             ' k8s/deployment.yaml
+
+      # --- Show image after update (debug) ---
+      - name: Show image after update
+        run: grep image k8s/deployment.yaml
 
       # --- Commit, rebase, and push the updated deployment.yaml (with retry loop) ---
       - name: Commit, rebase, and push updated deployment.yaml
