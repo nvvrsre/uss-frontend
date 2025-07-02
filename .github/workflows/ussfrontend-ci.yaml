@@ -1,3 +1,4 @@
+## Ushasree Frontend CI Pipeline with Deployment in ArgoCD
 name: Ushasree Frontend CI Pipeline
 
 on:
@@ -101,7 +102,7 @@ jobs:
         run: |
           git config --global user.email "nvvr53@gmail.com"
           git config --global user.name "nvvrsre"
-          git add 
+          git add .
           git commit -m "ci: update frontend image to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
           # Auto-add and commit any new changes before rebase (handles npm or yq side effects)
           git add -u
