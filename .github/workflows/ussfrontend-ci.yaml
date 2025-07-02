@@ -97,12 +97,15 @@ jobs:
         run: grep image k8s/deployment.yaml
 
       # --- Commit, rebase, and push the updated deployment.yaml (with retry loop) ---
-      - name: Commit, rebase, and push updated deployment.yaml
+            - name: Commit, rebase, and push updated deployment.yaml
         run: |
           git config --global user.email "nvvr53@gmail.com"
           git config --global user.name "nvvrsre"
-          git add k8s/deployment.yaml
+          git add .
           git commit -m "ci: update frontend image to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
+          # Auto-add and commit any new changes before rebase (handles npm or yq side effects)
+          git add -u
+          git commit -m "ci: auto-stage any changes before rebase" || echo "No changes to commit"
           # Retry logic for git pull --rebase and push
           n=0
           until [ $n -ge 3 ]
