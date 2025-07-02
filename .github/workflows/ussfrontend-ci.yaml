@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions: write-all   # Needed for pushing changes back to main
+
 jobs:
   uss-frontend-ci:
     timeout-minutes: 60
@@ -67,3 +69,28 @@ jobs:
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/uss-frontend:v${{ steps.version.outputs.VERSION }}
+
+      # --- NEW: Install yq for YAML editing ---
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+
+      # --- NEW: Update deployment.yaml image tag ---
+      - name: Update deployment.yaml with new image tag
+        run: |
+          yq -i '
+            .spec.template.spec.containers[] |=
+              select(.name == "uss-frontend") .image = "${{ secrets.DOCKERHUB_USERNAME }}/uss-frontend:v${{ steps.version.outputs.VERSION }}"
+            ' k8s/deployment.yaml
+
+      # --- NEW: Commit and push the updated deployment.yaml ---
+      - name: Commit and push updated deployment.yaml
+        run: |
+          git config --global user.email "nvvr53@gmail.com"
+          git config --global user.name "nvvrsre"
+          git add k8s/deployment.yaml
+          git commit -m "ci: update frontend image to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
