@@ -93,19 +93,25 @@ jobs:
               select(.name == "frontend") .image = "${{ secrets.DOCKERHUB_USERNAME }}/frontend:v${{ steps.version.outputs.VERSION }}"
             ' k8s/deployment.yaml
 
+      # --- Force ArgoCD Sync with dummy annotation ---
+      - name: Force ArgoCD Sync with dummy annotation
+        run: |
+          yq -i '
+            .spec.template.metadata.annotations["argocd-sync-force"] = strenv(GITHUB_RUN_ID)
+          ' k8s/deployment.yaml
+
       # --- Show image after update (debug) ---
       - name: Show image after update
         run: grep image k8s/deployment.yaml
 
-      # --- Commit, rebase, and push the updated deployment.yaml (with retry loop) ---
-            # --- Commit, rebase, and push the updated deployment.yaml (with retry loop, only manifest) ---
+      # --- Commit, rebase, and push the updated deployment.yaml (with retry loop, only manifest) ---
       - name: Commit, rebase, and push updated deployment.yaml
         run: |
           git config --global user.email "nvvr53@gmail.com"
           git config --global user.name "nvvrsre"
           git add k8s/deployment.yaml
           git status
-          git commit -m "ci: update frontend image to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
+          git commit -m "ci: update frontend image and force sync to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
           git status
           git reset
           n=0
@@ -113,7 +119,7 @@ jobs:
           do
             git pull --rebase origin main && \
             git add k8s/deployment.yaml && \
-            git commit -m "ci: update frontend image to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit" && \
+            git commit -m "ci: update frontend image and force sync to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit" && \
             git push origin main && break
             n=$((n+1))
             echo "Push failed, retrying ($n/3)..."
@@ -121,4 +127,3 @@ jobs:
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
