@@ -12,11 +12,11 @@ spec:
       labels:
         app: frontend
       annotations:
-        argocd-sync-force: "16042337920"
+        argocd-sync-force: "16066008738"
     spec:
       containers:
         - name: frontend
-          image: nvvrsre/frontend
+          image: nvvrsre/frontend:v1
           ports:
             - containerPort: 80
           resources:
