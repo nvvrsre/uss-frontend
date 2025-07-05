@@ -12,7 +12,7 @@ spec:
       labels:
         app: frontend
       annotations:
-        argocd-sync-force: "16066008738"
+        argocd-sync-force: "16084428030"
     spec:
       containers:
         - name: frontend
