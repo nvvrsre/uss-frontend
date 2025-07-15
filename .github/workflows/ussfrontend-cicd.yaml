@@ -1,5 +1,4 @@
-## Ushasree Frontend CI Pipeline with Deployment in ArgoCD
-name: Ushasree Frontend CI Pipeline
+name: Ushasree Frontend CI/CD Pipeline (Helm + ArgoCD)
 
 on:
   push:
@@ -7,10 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions: write-all   # Needed for pushing changes back to main
+permissions: write-all
 
 jobs:
-  uss-frontend-ci:
+  uss-frontend-ci-cd:
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
@@ -71,56 +70,29 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:v${{ steps.version.outputs.VERSION }}
 
-      # --- Install yq for YAML editing ---
+      # --- Helm image tag update ---
       - name: Install yq
         run: |
           sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64 -O /usr/local/bin/yq
           sudo chmod +x /usr/local/bin/yq
 
-      # --- Show image before update (debug) ---
-      - name: Show image before update
-        run: grep image k8s/deployment.yaml
-
-      # --- Print all container names (debug) ---
-      - name: Print all container names
-        run: yq '.spec.template.spec.containers[].name' k8s/deployment.yaml
-
-      # --- Update deployment.yaml image tag ---
-      - name: Update deployment.yaml with new image tag
+      - name: Update Helm values.yaml with new image tag
         run: |
-          yq -i '
-            .spec.template.spec.containers[] |=
-              select(.name == "frontend") .image = "${{ secrets.DOCKERHUB_USERNAME }}/frontend:v${{ steps.version.outputs.VERSION }}"
-            ' k8s/deployment.yaml
+          yq -i '.image.tag = "v${{ steps.version.outputs.VERSION }}"' helm/values.yaml
 
-      # --- Force ArgoCD Sync with dummy annotation ---
-      - name: Force ArgoCD Sync with dummy annotation
-        run: |
-          yq -i '
-            .spec.template.metadata.annotations["argocd-sync-force"] = strenv(GITHUB_RUN_ID)
-          ' k8s/deployment.yaml
+      - name: Show image tag after update
+        run: yq '.image.tag' helm/values.yaml
 
-      # --- Show image after update (debug) ---
-      - name: Show image after update
-        run: grep image k8s/deployment.yaml
-
-      # --- Commit, rebase, and push the updated deployment.yaml (with retry loop, only manifest) ---
-      - name: Commit, rebase, and push updated deployment.yaml
+      - name: Commit and push updated values.yaml
         run: |
           git config --global user.email "nvvr53@gmail.com"
           git config --global user.name "nvvrsre"
-          git add k8s/deployment.yaml
-          git status
-          git commit -m "ci: update frontend image and force sync to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
-          git status
-          git reset
+          git add helm/values.yaml
+          git commit -m "ci: update frontend image tag to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
           n=0
           until [ $n -ge 3 ]
           do
-            git pull --rebase origin main && \
-            git add k8s/deployment.yaml && \
-            git commit -m "ci: update frontend image and force sync to v${{ steps.version.outputs.VERSION }}" || echo "No changes to commit" && \
-            git push origin main && break
+            git pull --rebase origin main && git push origin main && break
             n=$((n+1))
             echo "Push failed, retrying ($n/3)..."
             sleep 2
