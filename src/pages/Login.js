@@ -52,7 +52,7 @@ function Login() {
       <button type="submit">Login</button>
       {msg && <div style={{ color: msg === "Login successful!" ? "green" : "red", marginTop: 10 }}>{msg}</div>}
       <div style={{ marginTop: 16 }}>
-        New to UshaSree? <Link to="/signup">Signup</Link>
+        New to UshaSree Stores ? <Link to="/signup">Signup</Link>
       </div>
     </form>
   );
