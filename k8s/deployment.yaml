@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: nvvrsre/frontend:v3.0
+          image: nvvrsre/frontend:v3.1
           ports:
             - containerPort: 80
           resources:
